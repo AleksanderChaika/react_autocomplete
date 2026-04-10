@@ -39,6 +39,10 @@ export const Autocomplete: React.FC<Props> = ({
       return people;
     }
 
+    if (debouncedQuery === '') {
+      return [];
+    }
+
     return people.filter(person =>
       person.name.toLowerCase().includes(debouncedQuery.toLowerCase()),
     );
@@ -47,7 +51,7 @@ export const Autocomplete: React.FC<Props> = ({
   const showNoSuggestions =
     isOpen &&
     query.trim() !== '' &&
-    debouncedQuery.trim() !== '' &&
+    debouncedQuery !== '' &&
     filteredPeople.length === 0;
 
   return (
@@ -59,6 +63,7 @@ export const Autocomplete: React.FC<Props> = ({
             placeholder="Enter a part of the name"
             className="input"
             data-cy="search-input"
+            data-qa="search-input"
             value={query}
             onFocus={() => setIsOpen(true)}
             onChange={event => {
@@ -69,12 +74,18 @@ export const Autocomplete: React.FC<Props> = ({
           />
         </div>
 
-        <div className="dropdown-menu" role="menu" data-cy="suggestions-list">
+        <div
+          className="dropdown-menu"
+          role="menu"
+          data-cy="suggestions-list"
+          data-qa="suggestions-list"
+        >
           <div className="dropdown-content">
             {filteredPeople.map(person => (
               <div
                 className="dropdown-item"
                 data-cy="suggestion-item"
+                data-qa="suggestion-item"
                 key={person.slug}
                 onMouseDown={() => {
                   setQuery(person.name);
@@ -101,6 +112,7 @@ export const Autocomplete: React.FC<Props> = ({
           "
           role="alert"
           data-cy="no-suggestions-message"
+          data-qa="no-suggestions-message"
         >
           <p className="has-text-danger">No matching suggestions</p>
         </div>
