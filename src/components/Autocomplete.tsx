@@ -17,8 +17,16 @@ export const Autocomplete: React.FC<Props> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    const normalizedQuery = query.trim();
+
+    if (normalizedQuery === '') {
+      setDebouncedQuery('');
+
+      return undefined;
+    }
+
     const timer = setTimeout(() => {
-      setDebouncedQuery(query);
+      setDebouncedQuery(normalizedQuery);
     }, delay);
 
     return () => {
@@ -27,10 +35,20 @@ export const Autocomplete: React.FC<Props> = ({
   }, [query, delay]);
 
   const filteredPeople = useMemo(() => {
+    if (query.trim() === '') {
+      return people;
+    }
+
     return people.filter(person =>
       person.name.toLowerCase().includes(debouncedQuery.toLowerCase()),
     );
-  }, [people, debouncedQuery]);
+  }, [people, query, debouncedQuery]);
+
+  const showNoSuggestions =
+    isOpen &&
+    query.trim() !== '' &&
+    debouncedQuery.trim() !== '' &&
+    filteredPeople.length === 0;
 
   return (
     <>
@@ -60,6 +78,7 @@ export const Autocomplete: React.FC<Props> = ({
                 key={person.slug}
                 onMouseDown={() => {
                   setQuery(person.name);
+                  setDebouncedQuery(person.name);
                   onSelected(person);
                   setIsOpen(false);
                 }}
@@ -71,7 +90,7 @@ export const Autocomplete: React.FC<Props> = ({
         </div>
       </div>
 
-      {isOpen && filteredPeople.length === 0 && (
+      {showNoSuggestions && (
         <div
           className="
             notification
